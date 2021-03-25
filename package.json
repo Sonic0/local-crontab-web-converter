@@ -1,0 +1,32 @@
+{
+  "name": "local-crontab-web-converter",
+  "version": "0.1.0",
+  "description": "Convert local crontab to UTC crontabs via simple web page.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sonic0/local-crontab-web-converter.git"
+  },
+  "keywords": [
+    "cron",
+    "crontab"
+  ],
+  "author": "Andrea Salvatori",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sonic0/local-crontab-web-converter/issues"
+  },
+  "homepage": "https://github.com/Sonic0/local-crontab-web-converter#readme",
+  "dependencies": {
+    "mobius1-selectr": "^2.4.13",
+    "tzdata": "^1.0.25"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.3"
+  }
+}
