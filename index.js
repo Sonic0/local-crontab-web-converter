@@ -4,24 +4,38 @@ import { zones } from 'tzdata';
 import 'regenerator-runtime/runtime';
 
 // Update UTC crontab list. ApiKey is in clear text
-const updateCrontab = async (url = '', apiKey = '', data = {}) => {
+const updateCrontab = async (config = {}, data = {}) => {
+  if (data['cron'].split(' ').length !== 5 ) {
+    document.querySelector('#output').innerHTML = `error: Wrong crontab string length`;
+    return
+  }
+
+  let output = "";
   try {
-    const res = await fetch(url, {
+    const res = await fetch(config.RestApiEndpoint, {
       method: 'POST',
       cache: 'no-cache',
       mode: "cors",
       headers: {
         'Content-Type': 'application/json', 
-        'X-api-key': apiKey
+        'X-api-key': config.RestApiKey
       },
       body: JSON.stringify(data)
     });
-    const json = await res.json();
-
-    document.querySelector('#output').innerHTML = json.join('<br>');
+    console.log(res)
+    if ([500, 404].includes(res['status'])) {
+      output = `Error --> response code: ${res['status']},
+                response message: ${res['statusText']}`;
+    } else {
+      const json = await res.json();
+      output = json.join('<br>');
+    }
+    
   } catch (error){
-    document.querySelector('#output').innerHTML = `error: ${error}`;
+    output = `error: ${error}`;
   }
+
+  document.querySelector('#output').innerHTML = output;
 };
 
 
@@ -31,11 +45,20 @@ document.querySelector('#timezone').innerHTML = Object.keys(zones)
 document.querySelector('#timezone').value = "America/New_York";
 const selector = new Selectr('#timezone', {width: 250});
 
-document.querySelector('#input').onkeyup = updateCrontab;
-document.querySelector('#timezone').onchange = updateCrontab;
-selector.on('selectr.change', updateCrontab);
+// Create variables with current values
+let localCrontab = document.querySelector('#input').value;
+let timezone = document.querySelector('#timezone').value;
 
-const localCrontab = document.querySelector('#input').value;
-const timezone = document.querySelector('#timezone').value;
+document.querySelector('#input').onkeyup = () => {
+  localCrontab = document.querySelector('#input').value
+  updateCrontab(configs, {"cron": localCrontab, "timezone": timezone});
+};
+document.querySelector('#timezone').onchange = () => {
+  timezone = document.querySelector('#timezone').value;
+};
 
-updateCrontab(configs.RestApiEndpoint, configs.RestApiKey, {"cron": localCrontab, "timezone": timezone});
+// Update Crontab when Timezone changes
+selector.on('selectr.change', () => updateCrontab(configs, {"cron": localCrontab, "timezone": timezone}));
+
+// Default - Update Crontab when site opened
+updateCrontab(configs, {"cron": localCrontab, "timezone": timezone});
