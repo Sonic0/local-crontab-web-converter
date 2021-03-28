@@ -22,10 +22,10 @@ const updateCrontab = async (config = {}, data = {}) => {
       },
       body: JSON.stringify(data)
     });
-    console.log(res)
+
     if ([500, 404].includes(res['status'])) {
-      output = `Error --> response code: ${res['status']},
-                response message: ${res['statusText']}`;
+      const json = await res.json();
+      output = `Error --> ${res['status']}, ${json['message']}`;
     } else {
       const json = await res.json();
       output = json.join('<br>');
